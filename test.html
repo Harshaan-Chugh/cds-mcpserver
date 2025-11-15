@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDS Database Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .query-section {
+            margin-bottom: 30px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .results {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 500px;
+            overflow: auto;
+        }
+        
+        .results h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ CDS Database Tester</h1>
+        <p class="subtitle">Test your PostgreSQL backend connection and explore the data</p>
+        
+        <div id="status" class="status loading">Checking server connection...</div>
+        
+        <div class="buttons">
+            <button onclick="checkHealth()">🏥 Check Health</button>
+            <button onclick="fetchUsers()">👥 Get Users</button>
+            <button onclick="fetchProducts()">📦 Get Products</button>
+            <button onclick="fetchOrders()">🛒 Get Orders</button>
+            <button onclick="fetchCategories()">📂 Get Categories</button>
+            <button onclick="fetchUserStats()">📊 User Stats</button>
+            <button onclick="fetchSalesStats()">💰 Sales Stats</button>
+            <button onclick="fetchTables()">📋 List Tables</button>
+        </div>
+        
+        <div class="query-section">
+            <h3>Custom SQL Query (SELECT only)</h3>
+            <textarea id="sqlQuery" placeholder="SELECT * FROM users LIMIT 5;">SELECT * FROM users LIMIT 5;</textarea>
+            <button onclick="executeQuery()" style="margin-top: 10px; width: 100%;">▶️ Execute Query</button>
+        </div>
+        
+        <div id="results" class="results" style="display: none;">
+            <h3>Results</h3>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let loading = false;
+
+        function showStatus(message, type = 'loading') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        function showResults(title, content) {
+            const resultsEl = document.getElementById('results');
+            const contentEl = document.getElementById('resultsContent');
+            resultsEl.style.display = 'block';
+            contentEl.innerHTML = `<h3>${title}</h3>${content}`;
+        }
+
+        function renderTable(data) {
+            if (!data || data.length === 0) {
+                return '<p>No data found</p>';
+            }
+
+            const headers = Object.keys(data[0]);
+            let html = '<table><thead><tr>';
+            headers.forEach(h => html += `<th>${h}</th>`);
+            html += '</tr></thead><tbody>';
+            
+            data.forEach(row => {
+                html += '<tr>';
+                headers.forEach(h => {
+                    const value = row[h] === null ? '<em>null</em>' : row[h];
+                    html += `<td>${value}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function renderJSON(data) {
+            return `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        function renderStats(data) {
+            let html = '<div class="stats-grid">';
+            for (const [key, value] of Object.entries(data)) {
+                html += `
+                    <div class="stat-card">
+                        <div class="stat-value">${value}</div>
+                        <div class="stat-label">${key.replace(/_/g, ' ').toUpperCase()}</div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        async function fetchData(endpoint, title, renderer = renderTable) {
+            if (loading) return;
+            loading = true;
+            showStatus('Loading...', 'loading');
+
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Request failed');
+                }
+
+                showResults(title, renderer(data));
+                showStatus('✅ Data loaded successfully', 'success');
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                showResults('Error', `<p style="color: red;">${error.message}</p>`);
+            } finally {
+                loading = false;
+            }
+        }
+
+        async function checkHealth() {
+            await fetchData('/health', 'Health Check', renderJSON);
+        }
+
+        async function fetchUsers() {
+            await fetchData('/api/users', 'All Users');
+        }
+
+        async function fetchProducts() {
+            await fetchData('/api/products', 'All Products');
+        }
+
+        async function fetchOrders() {
+            await fetchData('/api/orders', 'All Orders');
+        }
+
+        async function fetchCategories() {
+            await fetchData('/api/categories', 'All Categories');
+        }
+
+        async function fetchUserStats() {
+            await fetchData('/api/stats/users', 'User Statistics', renderStats);
+        }
+
+        async function fetchSalesStats() {
+            await fetchData('/api/stats/sales', 'Sales Statistics', renderStats);
+        }
+
+        async function fetchTables() {
+            await fetchData('/api/tables', 'Database Tables');
+        }
+
+        async function executeQuery() {
+            const sql = document.getElementById('sqlQuery').value.trim();
+            if (!sql) {
+                showStatus('❌ Please enter a SQL query', 'error');
+                return;
+            }
+
+            if (loading) return;
+            loading = true;
+            showStatus('Executing query...', 'loading');
+
+            try {
+                const response = await fetch(`${API_URL}/api/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sql })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Query failed');
+                }
+
+                showResults(
+                    `Query Results (${data.rowCount} rows)`,
+                    renderTable(data.rows)
+                );
+                showStatus('✅ Query executed successfully', 'success');
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                showResults('Error', `<p style="color: red;">${error.message}</p>`);
+            } finally {
+                loading = false;
+            }
+        }
+
+        // Check health on page load
+        window.addEventListener('load', checkHealth);
+    </script>
+</body>
+</html>

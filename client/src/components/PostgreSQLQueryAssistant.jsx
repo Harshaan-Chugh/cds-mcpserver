@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Database, Send, History, Star, Trash2, Info, Loader2, AlertCircle } from 'lucide-react';
 
+// Backend API URL - update this if your backend runs on a different port
+const API_URL = 'http://localhost:3001';
+
 export default function PostgreSQLQueryAssistant() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
