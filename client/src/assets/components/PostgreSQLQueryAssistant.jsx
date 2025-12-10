@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Database, Send, Sparkles, Terminal, Activity, AlertCircle, Loader2, ChevronRight } from 'lucide-react';
-
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 export default function PostgreSQLQueryAssistant() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ export default function PostgreSQLQueryAssistant() {
     setData(null);
 
     try {
-      const response = await fetch('http://localhost:3001/api/ai-query', {
+      const response = await fetch(`${API_BASE}/api/ai-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: query }),
