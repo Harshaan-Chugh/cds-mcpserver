@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Sets a solid dark background for the whole page */
+body {
+  background-color: #0f172a;
+  margin: 0;
+}

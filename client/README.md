@@ -1,15 +1,16 @@
-# Client React Component
+# React + Vite
 
-This directory contains the React frontend component for the PostgreSQL Query Assistant.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Component
+Currently, two official plugins are available:
 
-- `PostgreSQLQueryAssistant.jsx` - Main React component for querying the database
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Usage
+## React Compiler
 
-This component can be integrated into a React application. It connects to the backend API at `http://localhost:3001` by default.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Note
+## Expanding the ESLint configuration
 
-This is a standalone component. You'll need to integrate it into a React app with proper build setup (Vite, Create React App, etc.) to use it in production.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
