@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Database, Send, Sparkles, Terminal, Activity, AlertCircle, Loader2, ChevronRight } from 'lucide-react';
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:3001';
 export default function PostgreSQLQueryAssistant() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
